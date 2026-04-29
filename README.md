@@ -1,4 +1,4 @@
-# netrics/mwp-config
+# netrics/mwp-configs
 
 Public, read-only distribution repository for non-sensitive device and automation configuration files.
 
