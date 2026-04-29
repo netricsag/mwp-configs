@@ -1,33 +1,52 @@
-[[_TOC_]]
+# netrics/mwp-config
 
-# Foreword
-The following content acts as sample everything but the main headers might be replaced/edited.
+Public, read-only distribution repository for non-sensitive device and automation configuration files.
 
-# {PROJECT}/{NAME_OF_REPO}
-_Brief description of the repository purpose._
+This repository is intentionally quiet. It is not an application repository, does not contain buildable source code, and is not a support channel.
 
-# How to Build
-_Defines the steps required to build the application(s) contained within the repository._
+## Consumption
 
-## Dependencies
-- _MyLib_
-- _MySecondLib_ with the license (never store the license within the repository but point wherever it can be found).
-- _Application-A_
-- _Azure CosmosDB Emulator_
+Consumers should pin every request to an immutable release tag.
 
-## Projects / Solutions
-- Using Visual Studio open the `src/api/MyApplication.sln` file
-- Using VSCode open the `src/web` directory
+Manifest URL:
 
-# How to Run
-_Defines the steps to execute the content of the given repository. Given its applicable._
+```text
+https://raw.githubusercontent.com/netrics/mwp-config/v1.0.0/manifest.json
+```
 
-_In case the repository would contains multiples applications each of them must be listed here._
+Config URL pattern:
 
-# How to contribute
-_Define the steps how to contribute to the current repository._
+```text
+https://raw.githubusercontent.com/netrics/mwp-config/<tag>/configs/<area>/<name>
+```
 
-# Related Sources
-_Lists the other resources related to the given repository._
-- Other DevOps repositories (e.g. common)
-- DevOps Project URL
+Example:
+
+```text
+https://raw.githubusercontent.com/netrics/mwp-config/v1.0.0/configs/<area>/<name>
+```
+
+Do not consume floating `main` URLs. Tags such as `v1.0.0` and `v1.1.0` are the compatibility boundary for devices and automation.
+
+## Manifest
+
+The root `manifest.json` is machine-readable and contains:
+
+- `repo`: repository owner and name
+- `version`: release tag
+- `generatedAt`: timestamp for the manifest content
+- `configs`: published config entries
+
+Each config entry contains `path`, `area`, `name`, `sha256`, and a tag-pinned `rawUrl`.
+
+The initial `v1.0.0` release is scaffold-only and intentionally has no real config entries.
+
+## Ownership
+
+Netrics owns the repository and release process. Changes land through pull requests to `main`, then releases are created by tagging `main`.
+
+GitHub Issues, Wiki, Projects, and Discussions should remain disabled. Use the owning team's internal channels for change requests and operational support.
+
+## Public Data Only
+
+Everything in this repository is public by design. Do not commit secrets, credentials, tokens, private keys, customer-specific sensitive values, or internal-only operational data.

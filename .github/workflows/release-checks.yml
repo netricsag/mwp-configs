@@ -1,0 +1,173 @@
+name: release-checks
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: release-checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate repository structure
+        run: |
+          test -d configs
+          test -d docs
+          test -f manifest.json
+          test -f manifest.schema.json
+          test -f README.md
+          test -f .github/workflows/release-checks.yml
+          test ! -d src
+          test ! -d deploy
+
+      - name: Validate JSON syntax
+        run: |
+          python -m json.tool manifest.json >/dev/null
+          python -m json.tool manifest.schema.json >/dev/null
+
+      - name: Validate manifest consistency
+        shell: python
+        run: |
+          import hashlib
+          import json
+          import os
+          import re
+          import sys
+          from pathlib import Path, PurePosixPath
+
+          errors = []
+          manifest = json.loads(Path("manifest.json").read_text(encoding="utf-8"))
+
+          required_root = {"$schema", "repo", "version", "generatedAt", "configs"}
+          missing_root = required_root - manifest.keys()
+          if missing_root:
+              errors.append(f"manifest.json is missing root fields: {sorted(missing_root)}")
+
+          repo = manifest.get("repo")
+          version = manifest.get("version")
+          configs = manifest.get("configs")
+
+          if repo != "netrics/mwp-configs":
+              errors.append("manifest repo must be netrics/mwp-configs")
+
+          if not isinstance(version, str) or not re.fullmatch(r"v\d+\.\d+\.\d+", version):
+              errors.append("manifest version must use tag format vX.Y.Z")
+
+          if not isinstance(configs, list):
+              errors.append("manifest configs must be an array")
+              configs = []
+
+          github_ref_type = os.getenv("GITHUB_REF_TYPE")
+          github_ref_name = os.getenv("GITHUB_REF_NAME")
+          if github_ref_type == "tag" and github_ref_name != version:
+              errors.append(f"tag push {github_ref_name} does not match manifest version {version}")
+
+          manifest_paths = set()
+          for index, entry in enumerate(configs):
+              prefix = f"configs[{index}]"
+              required_entry = {"path", "area", "name", "sha256", "rawUrl"}
+              missing_entry = required_entry - entry.keys()
+              if missing_entry:
+                  errors.append(f"{prefix} is missing fields: {sorted(missing_entry)}")
+                  continue
+
+              path = entry["path"]
+              area = entry["area"]
+              name = entry["name"]
+              sha256 = entry["sha256"]
+              raw_url = entry["rawUrl"]
+
+              if path in manifest_paths:
+                  errors.append(f"{prefix}.path duplicates {path}")
+              manifest_paths.add(path)
+
+              posix_path = PurePosixPath(path)
+              if posix_path.is_absolute() or ".." in posix_path.parts:
+                  errors.append(f"{prefix}.path must be a relative path without parent traversal")
+                  continue
+
+              expected_path = PurePosixPath("configs") / area / name
+              if posix_path != expected_path:
+                  errors.append(f"{prefix}.path must equal configs/<area>/<name>")
+
+              if posix_path.parts[:1] != ("configs",):
+                  errors.append(f"{prefix}.path must be under configs/")
+
+              file_path = Path(*posix_path.parts)
+              if not file_path.is_file():
+                  errors.append(f"{prefix}.path does not exist: {path}")
+                  continue
+
+              actual_sha256 = hashlib.sha256(file_path.read_bytes()).hexdigest()
+              if sha256 != actual_sha256:
+                  errors.append(f"{prefix}.sha256 mismatch for {path}")
+
+              expected_raw_url = f"https://raw.githubusercontent.com/{repo}/{version}/{path}"
+              if raw_url != expected_raw_url:
+                  errors.append(f"{prefix}.rawUrl must be {expected_raw_url}")
+
+              if "/main/" in raw_url:
+                  errors.append(f"{prefix}.rawUrl must not point at main")
+
+          actual_config_paths = {
+              path.as_posix()
+              for path in Path("configs").rglob("*")
+              if path.is_file() and not any(part.startswith(".") for part in path.parts[1:])
+          }
+          unlisted = actual_config_paths - manifest_paths
+          if unlisted:
+              errors.append(f"configs files missing from manifest: {sorted(unlisted)}")
+
+          if errors:
+              for error in errors:
+                  print(f"ERROR: {error}", file=sys.stderr)
+              sys.exit(1)
+
+      - name: Scan for obvious secrets
+        shell: python
+        run: |
+          import re
+          import sys
+          from pathlib import Path
+
+          patterns = {
+              "private key": re.compile(r"-----BEGIN (?:RSA |DSA |EC |OPENSSH |PGP )?PRIVATE KEY-----"),
+              "aws access key": re.compile(r"\bAKIA[0-9A-Z]{16}\b"),
+              "google api key": re.compile(r"\bAIza[0-9A-Za-z_-]{35}\b"),
+              "github token": re.compile(r"\bgh[pousr]_[0-9A-Za-z]{36,}\b"),
+              "slack token": re.compile(r"\bxox[baprs]-[0-9A-Za-z-]{10,}\b"),
+              "generic secret assignment": re.compile(
+                  r"(?i)\b(password|passwd|pwd|secret|token|api[_-]?key)\b\s*[:=]\s*['\"]?[A-Za-z0-9_./+=:@-]{12,}"
+              ),
+          }
+
+          errors = []
+          for path in Path(".").rglob("*"):
+              if not path.is_file() or ".git" in path.parts:
+                  continue
+              try:
+                  text = path.read_text(encoding="utf-8")
+              except UnicodeDecodeError:
+                  continue
+              for name, pattern in patterns.items():
+                  if pattern.search(text):
+                      errors.append(f"{path.as_posix()}: possible {name}")
+
+          if errors:
+              for error in errors:
+                  print(f"ERROR: {error}", file=sys.stderr)
+              sys.exit(1)
