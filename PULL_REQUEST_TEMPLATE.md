@@ -9,11 +9,12 @@ Describe the config or repository change and the intended release tag.
 - [ ] `manifest.json` has been updated for every added, changed, or removed config file.
 - [ ] Manifest `sha256` values match the referenced files.
 - [ ] Manifest `rawUrl` values are pinned to the intended release tag, not `main`.
+- [ ] Any `latest` channel impact is intentional and described below.
 - [ ] `release-checks` passes.
 
 ## Consumer Impact
 
-Describe whether existing tag-pinned consumers are unaffected, or whether this prepares a new release for updated consumers.
+Describe whether existing tag-pinned consumers are unaffected, and whether the mutable `latest` channel should advance to this release.
 
 ## Validation
 

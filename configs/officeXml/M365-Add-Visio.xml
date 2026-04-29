@@ -1,0 +1,12 @@
+<Configuration ID="M365-Add-Visio">
+  <Logging Level="Standard" Path="C:\Windows\Logs\Software\OfficeLogs" />
+  <Add Channel="MonthlyEnterprise" AllowCdnFallback="TRUE" Version="MatchInstalled">
+    <Product ID="VisioProRetail">
+      <Language ID="MatchInstalled" TargetProduct="O365ProPlusRetail" />
+    </Product>
+  </Add>
+  <Updates Enabled="TRUE" Branch="MonthlyEnterprise" />
+  <Display Level="None" AcceptEULA="TRUE" />
+  <Property Name="AUTOACTIVATE" Value="1" />
+  <Updates Enabled="TRUE" />
+</Configuration>

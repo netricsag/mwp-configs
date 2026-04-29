@@ -1,7 +1,29 @@
 {
   "$schema": "./manifest.schema.json",
-  "repo": "netrics/mwp-config",
-  "version": "v1.0.0",
-  "generatedAt": "2026-04-29T13:21:35Z",
-  "configs": []
+  "repo": "netrics/mwp-configs",
+  "version": "v1.1.0",
+  "generatedAt": "2026-04-29T14:01:03Z",
+  "configs": [
+    {
+      "path": "configs/officeXml/M365-Add-Project.xml",
+      "area": "officeXml",
+      "name": "M365-Add-Project.xml",
+      "sha256": "8fbaa5f0cd40aad2e107cde41cf0f26489bb3d2529cfbb00ff31bc623116474d",
+      "rawUrl": "https://raw.githubusercontent.com/netrics/mwp-configs/v1.1.0/configs/officeXml/M365-Add-Project.xml"
+    },
+    {
+      "path": "configs/officeXml/M365-Add-Visio.xml",
+      "area": "officeXml",
+      "name": "M365-Add-Visio.xml",
+      "sha256": "3731a0884b2004027eb624096027074f9802c7f39ee4273bb4cfa20aed81e67b",
+      "rawUrl": "https://raw.githubusercontent.com/netrics/mwp-configs/v1.1.0/configs/officeXml/M365-Add-Visio.xml"
+    },
+    {
+      "path": "configs/officeXml/M365-Base-CH-MUI-MatchOS.xml",
+      "area": "officeXml",
+      "name": "M365-Base-CH-MUI-MatchOS.xml",
+      "sha256": "864cf42bd5e2d05f16aef3a75d687f0fc0ab3e709ee6f619a7bc7bb2a47176ac",
+      "rawUrl": "https://raw.githubusercontent.com/netrics/mwp-configs/v1.1.0/configs/officeXml/M365-Base-CH-MUI-MatchOS.xml"
+    }
+  ]
 }
