@@ -6,27 +6,33 @@ This repository is intentionally quiet. It is not an application repository, doe
 
 ## Consumption
 
-Consumers should pin every request to an immutable release tag.
+Consumers should prefer immutable release tags. The repository also publishes a mutable `latest` channel for tooling that needs Docker-style "current release" behavior.
 
-Manifest URL:
+Pinned manifest URL:
 
 ```text
-https://raw.githubusercontent.com/netrics/mwp-config/v1.0.0/manifest.json
+https://raw.githubusercontent.com/netrics/mwp-configs/v1.0.0/manifest.json
 ```
 
-Config URL pattern:
+Pinned config URL pattern:
 
 ```text
-https://raw.githubusercontent.com/netrics/mwp-config/<tag>/configs/<area>/<name>
+https://raw.githubusercontent.com/netrics/mwp-configs/<tag>/configs/<area>/<name>
 ```
 
 Example:
 
 ```text
-https://raw.githubusercontent.com/netrics/mwp-config/v1.0.0/configs/<area>/<name>
+https://raw.githubusercontent.com/netrics/mwp-configs/v1.0.0/configs/<area>/<name>
 ```
 
-Do not consume floating `main` URLs. Tags such as `v1.0.0` and `v1.1.0` are the compatibility boundary for devices and automation.
+Mutable `latest` channel URL pattern:
+
+```text
+https://raw.githubusercontent.com/netrics/mwp-configs/latest/configs/<area>/<name>
+```
+
+Do not consume floating `main` URLs. Tags such as `v1.0.0` and `v1.1.0` are the compatibility boundary for deterministic consumers. The `latest` branch is mutable and is advanced only after a reviewed and tagged release.
 
 ## Manifest
 
@@ -39,11 +45,13 @@ The root `manifest.json` is machine-readable and contains:
 
 Each config entry contains `path`, `area`, `name`, `sha256`, and a tag-pinned `rawUrl`.
 
+The `latest` branch carries the same manifest as the current release. Consumers can fetch `latest/manifest.json` to discover the current release version, then use the manifest's tag-pinned `rawUrl` values when they need checksum-stable downloads.
+
 The initial `v1.0.0` release is scaffold-only and intentionally has no real config entries.
 
 ## Ownership
 
-Netrics owns the repository and release process. Changes land through pull requests to `main`, then releases are created by tagging `main`.
+Netrics owns the repository and release process. Changes land through pull requests to `main`, releases are created by tagging `main`, and the `latest` branch is moved to the released commit.
 
 GitHub Issues, Wiki, Projects, and Discussions should remain disabled. Use the owning team's internal channels for change requests and operational support.
 

@@ -1,0 +1,25 @@
+<Configuration ID="M365-Base-CH-MUI-MatchOS">
+  <Add OfficeClientEdition="64"
+       Channel="MonthlyEnterprise"
+       AllowCdnFallback="TRUE"
+       MigrateArch="TRUE">
+    <Product ID="O365ProPlusRetail">
+      <Language ID="MatchOS" Fallback="en-us" />
+      <Language ID="de-de" />
+      <Language ID="fr-fr" />
+      <Language ID="it-it" />
+      <Language ID="en-us" />
+      <ExcludeApp ID="OneDrive" />
+      <ExcludeApp ID="Teams" />
+      <ExcludeApp ID="Groove" />
+      <ExcludeApp ID="Lync" />
+      <ExcludeApp ID="Bing" />
+    </Product>
+  </Add>
+
+  <Display Level="None" AcceptEULA="TRUE" />
+  <Property Name="FORCEAPPSHUTDOWN" Value="TRUE" />
+  <Property Name="AUTOACTIVATE" Value="1" />
+  <Updates Enabled="TRUE" />
+  <RemoveMSI />
+</Configuration>
