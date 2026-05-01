@@ -39,6 +39,8 @@ It contains the repository contract, schema, validation workflow, and an empty m
 6. Tag `main`, for example `v1.1.0`.
 7. Move the `latest` branch to the same commit.
 
+Manifest checksums are calculated over repository/raw URL bytes. On Windows, do not use a CRLF working-tree hash if Git normalizes the file to LF.
+
 Consumers that need deterministic behavior must use URLs pinned to release tags. Consumers that need automatic current-release behavior may use `latest` URLs. Do not publish or document floating `main` raw URLs for devices or automation.
 
 Example release commands after `main` contains the reviewed release commit:

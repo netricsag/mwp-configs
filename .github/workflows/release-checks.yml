@@ -115,7 +115,10 @@ jobs:
 
               actual_sha256 = hashlib.sha256(file_path.read_bytes()).hexdigest()
               if sha256 != actual_sha256:
-                  errors.append(f"{prefix}.sha256 mismatch for {path}")
+                  errors.append(
+                      f"{prefix}.sha256 mismatch for {path}: "
+                      f"manifest={sha256} actual={actual_sha256}"
+                  )
 
               expected_raw_url = f"https://raw.githubusercontent.com/{repo}/{version}/{path}"
               if raw_url != expected_raw_url:
